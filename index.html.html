@@ -622,107 +622,80 @@ let pdfDoc = null;
 let currentPage = 1;
 
 // Download button
-document.getElementById("resume-dl").href = PDF_URL;
-document.getElementById("resume-dl").setAttribute("download", "Balaji_Janjanam_Resume.pdf");
+const resumeBtn = document.getElementById("resume-dl");
+resumeBtn.href = PDF_URL;
+resumeBtn.download = "Balaji_Janjanam_Resume.pdf";
 
 // Load PDF.js
 const script = document.createElement("script");
-script.src =
-  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
 
-script.onload = () => {
+script.onload = function () {
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-  pdfjsLib
-    .getDocument(PDF_URL)
-    .promise
-    .then((pdf) => {
+    pdfjsLib.getDocument(PDF_URL).promise
+        .then(function (pdf) {
 
-      pdfDoc = pdf;
+            pdfDoc = pdf;
 
-      document.getElementById("page-info").textContent =
-        `Page 1 of ${pdf.numPages}`;
+            document.getElementById("page-info").textContent =
+                "Page 1 of " + pdf.numPages;
 
-      renderPage(1);
+            renderPage(1);
 
-    })
-    .catch((err) => {
+        })
+        .catch(function (err) {
 
-      console.error(err);
+            console.error(err);
 
-      document.getElementById("page-info").textContent =
-        "Unable to load resume.";
+            document.getElementById("page-info").textContent =
+                "Unable to load PDF";
 
-    });
+        });
 
 };
 
 document.head.appendChild(script);
 
-function renderPage(pageNumber) {
+function renderPage(num) {
 
-  pdfDoc.getPage(pageNumber).then((page) => {
+    pdfDoc.getPage(num).then(function (page) {
 
-    const canvas = document.getElementById("resume-canvas");
+        const canvas = document.getElementById("resume-canvas");
+        const ctx = canvas.getContext("2d");
 
-    const ctx = canvas.getContext("2d");
+        const viewport = page.getViewport({ scale: 1.5 });
 
-    const viewport = page.getViewport({ scale: 1.5 });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
 
-    canvas.width = viewport.width;
+        page.render({
+            canvasContext: ctx,
+            viewport: viewport
+        });
 
-    canvas.height = viewport.height;
+        document.getElementById("page-info").textContent =
+            "Page " + num + " of " + pdfDoc.numPages;
 
-    page.render({
-      canvasContext: ctx,
-      viewport: viewport
     });
 
-    document.getElementById("page-info").textContent =
-      `Page ${pageNumber} of ${pdfDoc.numPages}`;
-
-  });
-
 }
 
 function changePage(delta) {
 
-  if (!pdfDoc) return;
+    if (!pdfDoc) return;
 
-  const next = currentPage + delta;
+    const next = currentPage + delta;
 
-  if (next < 1 || next > pdfDoc.numPages) return;
+    if (next < 1 || next > pdfDoc.numPages) return;
 
-  currentPage = next;
+    currentPage = next;
 
-  renderPage(currentPage);
+    renderPage(currentPage);
 
 }
-  pdfDoc.getPage(num).then(function(page) {
-    const canvas = document.getElementById('resume-canvas');
-    const ctx = canvas.getContext('2d');
-    const container = canvas.parentElement;
-    const scale = (container.clientWidth - 32) / page.getViewport({scale: 1}).width;
-    const vp = page.getViewport({scale: scale});
-    canvas.width = vp.width;
-    canvas.height = vp.height;
-    page.render({ canvasContext: ctx, viewport: vp });
-    document.getElementById('page-info').textContent = 'Page ' + num + ' of ' + pdfDoc.numPages;
-  });
-}
-
-function changePage(delta) {
-  if (!pdfDoc) return;
-  const next = currentPage + delta;
-  if (next < 1 || next > pdfDoc.numPages) return;
-  currentPage = next;
-  renderPage(currentPage);
-}
-</script>
-
-<!-- CONTACT -->
 <section id="contact">
   <div class="container fade-in">
     <div class="section-label">// contact</div>
