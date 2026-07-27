@@ -615,38 +615,91 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:1.5rem 2r
 
 <script>
 // PDF.js resume renderer
+
 const PDF_URL = "assets/resume.pdf";
-function b64toUint8(b64) {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-  return arr;
-}
+
+let pdfDoc = null;
+let currentPage = 1;
 
 // Download button
-document.getElementById("resume-dl").href = "assets/resume.pdf";
-  e.preventDefault();
-  const a = document.createElement('a');
-  a.href = 'data:application/pdf;base64,' + PDF_B64;
-  a.download = 'Janjanam-Balaji-Resume.pdf';
-  a.click();
-});
+document.getElementById("resume-dl").href = PDF_URL;
+document.getElementById("resume-dl").setAttribute("download", "Balaji_Janjanam_Resume.pdf");
 
-let pdfDoc = null, currentPage = 1;
+// Load PDF.js
+const script = document.createElement("script");
+script.src =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
 
-const script = document.createElement('script');
-script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-script.onload = function() {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-const PDF_URL = "assets/resume.pdf";
-pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf) {    pdfDoc = pdf;
-    document.getElementById('page-info').textContent = 'Page 1 of ' + pdf.numPages;
-    renderPage(1);
-  });
+script.onload = () => {
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  pdfjsLib
+    .getDocument(PDF_URL)
+    .promise
+    .then((pdf) => {
+
+      pdfDoc = pdf;
+
+      document.getElementById("page-info").textContent =
+        `Page 1 of ${pdf.numPages}`;
+
+      renderPage(1);
+
+    })
+    .catch((err) => {
+
+      console.error(err);
+
+      document.getElementById("page-info").textContent =
+        "Unable to load resume.";
+
+    });
+
 };
+
 document.head.appendChild(script);
 
-function renderPage(num) {
+function renderPage(pageNumber) {
+
+  pdfDoc.getPage(pageNumber).then((page) => {
+
+    const canvas = document.getElementById("resume-canvas");
+
+    const ctx = canvas.getContext("2d");
+
+    const viewport = page.getViewport({ scale: 1.5 });
+
+    canvas.width = viewport.width;
+
+    canvas.height = viewport.height;
+
+    page.render({
+      canvasContext: ctx,
+      viewport: viewport
+    });
+
+    document.getElementById("page-info").textContent =
+      `Page ${pageNumber} of ${pdfDoc.numPages}`;
+
+  });
+
+}
+
+function changePage(delta) {
+
+  if (!pdfDoc) return;
+
+  const next = currentPage + delta;
+
+  if (next < 1 || next > pdfDoc.numPages) return;
+
+  currentPage = next;
+
+  renderPage(currentPage);
+
+}
   pdfDoc.getPage(num).then(function(page) {
     const canvas = document.getElementById('resume-canvas');
     const ctx = canvas.getContext('2d');
