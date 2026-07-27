@@ -624,7 +624,7 @@ function b64toUint8(b64) {
 }
 
 // Download button
-document.getElementById('resume-dl').addEventListener('click', function(e) {
+document.getElementById("resume-dl").href = "assets/resume.pdf";
   e.preventDefault();
   const a = document.createElement('a');
   a.href = 'data:application/pdf;base64,' + PDF_B64;
