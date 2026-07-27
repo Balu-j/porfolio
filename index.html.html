@@ -638,8 +638,8 @@ const script = document.createElement('script');
 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
 script.onload = function() {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  pdfjsLib.getDocument({ data: b64toUint8(PDF_B64) }).promise.then(function(pdf) {
-    pdfDoc = pdf;
+const PDF_URL = "assets/resume.pdf";
+pdfjsLib.getDocument(PDF_URL).promise.then(function(pdf) {    pdfDoc = pdf;
     document.getElementById('page-info').textContent = 'Page 1 of ' + pdf.numPages;
     renderPage(1);
   });
