@@ -684,18 +684,13 @@ function renderPage(num) {
 }
 
 function changePage(delta) {
-
     if (!pdfDoc) return;
-
     const next = currentPage + delta;
-
     if (next < 1 || next > pdfDoc.numPages) return;
-
     currentPage = next;
-
     renderPage(currentPage);
-  </script>
-
+  </script>     <!-- ❌ script tag closed BEFORE the function's closing brace -->
+}
 }
 <section id="contact">
   <div class="container fade-in">
