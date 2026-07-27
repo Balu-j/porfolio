@@ -689,8 +689,9 @@ function changePage(delta) {
     if (next < 1 || next > pdfDoc.numPages) return;
     currentPage = next;
     renderPage(currentPage);
-  </script>     <!-- ❌ script tag closed BEFORE the function's closing brace -->
 }
+</script>
+
 <section id="contact">
   <div class="container fade-in">
     <div class="section-label">// contact</div>
